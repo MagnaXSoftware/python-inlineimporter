@@ -1,3 +1,5 @@
+import os as _os
+import sys as _sys
 from functools import lru_cache
 from importlib.machinery import ModuleSpec
 from importlib.abc import ExecutionLoader, MetaPathFinder
@@ -18,6 +20,9 @@ class InlineImporter(ExecutionLoader, MetaPathFinder):
             # We have inlined this module, so return the spec
             ms = ModuleSpec(fullname, cls, origin=cls.get_filename(fullname), is_package=cls.is_package(fullname))
             ms.has_location = True
+            if ms.submodule_search_locations is not None:
+                for p in _sys.path:
+                    ms.submodule_search_locations.append(_os.path.join(p, _os.path.dirname(ms.origin)))
             return ms
 
         return None
