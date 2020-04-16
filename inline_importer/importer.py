@@ -7,7 +7,9 @@ from importlib.abc import ExecutionLoader, MetaPathFinder
 
 class InlineImporter(ExecutionLoader, MetaPathFinder):
 
-    _inlined_modules = {}
+    version = None
+    inlined_modules = {}
+    namespace_packages = False
 
     @classmethod
     def find_spec(cls, fullname, path=None, target=None):
@@ -16,11 +18,11 @@ class InlineImporter(ExecutionLoader, MetaPathFinder):
         Because we only deal with our inlined module, we don't have to care about path or target.
         The import machinery also takes care of fully resolving all names, so we just have to deal with the fullnames.
         """
-        if fullname in cls._inlined_modules:
+        if fullname in cls.inlined_modules:
             # We have inlined this module, so return the spec
             ms = ModuleSpec(fullname, cls, origin=cls.get_filename(fullname), is_package=cls.is_package(fullname))
             ms.has_location = True
-            if ms.submodule_search_locations is not None:
+            if cls.namespace_packages and ms.submodule_search_locations is not None:
                 for p in _sys.path:
                     ms.submodule_search_locations.append(_os.path.join(p, _os.path.dirname(ms.origin)))
             return ms
@@ -58,10 +60,10 @@ class InlineImporter(ExecutionLoader, MetaPathFinder):
 
         Raises ImportError if the module cannot be found.
         """
-        if fullname not in cls._inlined_modules:
+        if fullname not in cls.inlined_modules:
             raise ImportError
 
-        mod = cls._inlined_modules[fullname]
+        mod = cls.inlined_modules[fullname]
         origin = fullname
         if mod[0]:
             origin = ".".join([origin, "__init__"])
@@ -72,17 +74,17 @@ class InlineImporter(ExecutionLoader, MetaPathFinder):
     @classmethod
     @lru_cache(maxsize=None)
     def is_package(cls, fullname):
-        if fullname not in cls._inlined_modules:
+        if fullname not in cls.inlined_modules:
             raise ImportError
 
-        return cls._inlined_modules[fullname][0]
+        return cls.inlined_modules[fullname][0]
 
     @classmethod
     def get_source(cls, fullname):
-        if fullname not in cls._inlined_modules:
+        if fullname not in cls.inlined_modules:
             raise ImportError
 
-        return cls._inlined_modules[fullname][1]
+        return cls.inlined_modules[fullname][1]
 
     @classmethod
     def get_code(cls, fullname):

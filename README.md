@@ -7,7 +7,7 @@ InlineImporter is a library for python projects that uses the PEP 302 import pro
 Because we can.
 
 But in all seriousness, this came out from spending days managing adhoc scripts that shared a lot of functionality.
-For ease of development, it would have been nice to extract the common pieces to a library, but that would have meant distributing a whole directory and managing import paths on the destination systems versus a single self-contained file.
+For ease of development, it would have been nice to extract the common pieces to a common library, but that would have meant distributing a whole directory and managing import paths on the destination systems versus a single self-contained file.
 
 ## How it works
 
@@ -25,11 +25,22 @@ The finder searche the dictionary for a key matching the given module name.
 If found, it returns a ModuleSpec with itself listed as the loader.
 The loader simply compiles the inlined source code to python bytecode, and executes it as the normal python loader does.
 
+## Usage
+
+Include `inline-importer` in your development dependencies.
+**`inline-importer` is not a runtime dependency, but a build-time dependency instead.**
+
+Build your final script using _TDB_ and distribute the output of that instead.
+
+Your users will not require `inline-importer`.
+However, if you have dependencies on other modules, your users will have to install those.
+
 ## What's next
 
 While the importer is built, the rest of the machinery isn't.
 
 * [x] Importer with PoC.
 * [ ] Script to collect all the modules to be inlined and build the dictionary.
-* [ ] Script that can combine the importer and the modules.
+* [x] Script that can combine the importer and the modules.
+* [ ] Support for inlining distributed python libraries.
 * [ ] Support for pre-compiled bytecode.
