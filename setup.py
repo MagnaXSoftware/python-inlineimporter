@@ -24,7 +24,7 @@ setup(
     description="Python module inlining library",
     long_description=readme(),
     long_description_content_type="text/markdown",
-    url="https://github.com/t0xicCode/python-inlineimporter",
+    url="https://github.com/MagnaXSoftware/python-inlineimporter",
     # Author details
     author="MagnaX Software",
     author_email="info@magnax.ca",
