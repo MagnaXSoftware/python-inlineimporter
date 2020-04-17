@@ -1,8 +1,8 @@
 import os as _os
 import sys as _sys
-from functools import lru_cache
-from importlib.machinery import ModuleSpec
+from functools import lru_cache as _lru_cache
 from importlib.abc import ExecutionLoader, MetaPathFinder
+from importlib.machinery import ModuleSpec
 
 
 class InlineImporter(ExecutionLoader, MetaPathFinder):
@@ -54,7 +54,7 @@ class InlineImporter(ExecutionLoader, MetaPathFinder):
         cls._call_with_frames_removed(exec, code, module.__dict__)
 
     @classmethod
-    @lru_cache(maxsize=None)
+    @_lru_cache(maxsize=None)
     def get_filename(cls, fullname):
         """Returns the 
 
@@ -72,7 +72,7 @@ class InlineImporter(ExecutionLoader, MetaPathFinder):
         return origin
 
     @classmethod
-    @lru_cache(maxsize=None)
+    @_lru_cache(maxsize=None)
     def is_package(cls, fullname):
         if fullname not in cls.inlined_modules:
             raise ImportError
