@@ -40,7 +40,7 @@ However, if you have dependencies on other modules, your users will have to inst
 While the importer is built, the rest of the machinery isn't.
 
 * [x] Importer with PoC.
-* [ ] Script to collect all the modules to be inlined and build the dictionary.
+* [x] Script to collect all the modules to be inlined and build the dictionary.
 * [x] Script that can combine the importer and the modules.
 * [ ] Support for inlining distributed python libraries.
 * [ ] Support for pre-compiled bytecode.
