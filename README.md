@@ -30,7 +30,7 @@ The loader simply compiles the inlined source code to python bytecode, and execu
 Include `inline-importer` in your development dependencies.
 **`inline-importer` is not a runtime dependency, but a build-time dependency instead.**
 
-Build your final script using _TDB_ and distribute the output of that instead.
+Build your final script using `inline-python` or `python -m inline_importer` and distribute the output of that instead.
 
 Your users will not require `inline-importer`.
 However, if you have dependencies on other modules, your users will have to install those.

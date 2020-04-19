@@ -43,11 +43,17 @@ def build_file(
         return f.getvalue()
 
 
-def write_file(filename, *args, **kwargs):
+def write_file(file_or_filename, *args, **kwargs):
     """Build a single file script and write it to filename.
 
     Other than a filename, the rest of the arguments are passed verbatim to build_file.
+
+    :param file_or_filename: Either a file-like object with a `write` method or a str-like object representing a filename.
+    :return: integer, the numer of bytes written
     """
 
-    with open(filename, "w") as f:
+    if hasattr(file_or_filename, "write"):
+        return file_or_filename.write(build_file(*args, **kwargs))
+
+    with open(file_or_filename, "w") as f:
         return f.write(build_file(*args, **kwargs))

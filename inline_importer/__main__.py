@@ -43,7 +43,7 @@ def parse_args(name):
     parser.add_argument(
         "-n",
         "--namespace-inlined-packages",
-        help="Whether inlined packages be marked as PEP 420 namespace packages. None uses the libary default, currently False.",
+        help="Whether inlined packages be marked as PEP 420 namespace packages. None uses the libary default, currently False",
         default=None,
         choices=(None, True, False),
         type=_ternary_type,
@@ -60,14 +60,22 @@ def parse_args(name):
     inputs.add_argument(
         "-f",
         "--input-file",
-        help="Path to a file to inline. This file will not be placed in a package.",
+        help="Path to a file to inline. This file will not be placed in a package",
         dest="input_files",
+        default=[],
+        nargs="*",
+    )
+    inputs.add_argument(
+        "-p",
+        "--input-package",
+        help="Path to a package to inline. This should be either the path to the __init__.py file or the folder containing it. All submodules and subpackages will also be imported",
+        dest="input_packages",
         default=[],
         nargs="*",
     )
 
     parser.add_argument(
-        "-o", "--output-file", help="Name of the output file. Use - to output to stdout instead.", required=True
+        "-o", "--output-file", help="Name of the output file. Use - to output to stdout instead", required=True
     )
 
     args = parser.parse_args()
@@ -88,24 +96,27 @@ def main():
     args = parse_args(name)
 
     # Collect and inline the modules
-    # Because of the mutually exclusive group, we only have one type of
+    # Because of the mutually exclusive group, we only have one type of entrypoint defined
     entrypoint = args.entrypoint_script
     if args.entrypoint_file:
         entrypoint = inliner.get_file_source(args.entrypoint_file)
     if args.entrypoint_module:
         entrypoint = inliner.get_module_source(args.entrypoint_module)
 
-    inlined = inliner.build_inlined(files=args.input_files)
+    inlined = inliner.build_inlined(files=args.input_files, packages=args.input_packages)
 
     # Build the inlined script
-    builder_args = dict(
-        inlined_modules=inlined, entrypoint=entrypoint, importer_module=args.importer_module, shebang=args.shebang
-    )
+    output = args.output_file
+    if output == "-":
+        output = sys.stdout
 
-    if args.output_file == "-":
-        print(builder.build_file(**builder_args), file=sys.stdout)
-    else:
-        builder.write_file(args.output_file, **builder_args)
+    builder.write_file(
+        output,
+        inlined_modules=inlined,
+        entrypoint=entrypoint,
+        importer_module=args.importer_module,
+        shebang=args.shebang,
+    )
 
 
 if __name__ == "__main__":

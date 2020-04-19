@@ -44,28 +44,77 @@ def get_module_source(fullname_or_module):
     return inspect.getsource(module)
 
 
-def extract_module_name(filename):
-    """Convenience method to extract a module name from a filename.
+def extract_module_name(path):
+    # type: (str) -> str
+    """Convenience method to extract a module name from a path.
     """
-    name = os.path.basename(filename).rpartition(".")[0]
+    name = os.path.basename(path).rpartition(".")[0]
 
     if not name:
-        raise InlinerException("Unable to determine module name from file {!r}".format(filename))
+        raise InlinerException("Unable to determine module name from file {!r}".format(path))
 
     return name
 
 
-def build_inlined(files):
-    # type: (List[str]) -> Dict[str, ModuleDefinition]
+def extract_package_name(path):
+    # type: (str) -> str
+    """Convenience method to extract a package name from a path.
+    """
 
-    inlined = {}
+    if "." in os.path.basename(path):
+        # Because python modules cannot contain dots, if there is a dot in the last component of a path, it's a module,
+        # so we get the dirname instead.
+        path = os.path.dirname(path)
+
+    if path[-1:] == "/":
+        path = path[:-1]
+
+    return os.path.basename(path)
+
+
+class Repository(dict):
+    def insert_module(self, name, source, is_package=False):
+        if name in self:
+            raise InlinerException("Module {!r} is already present in the repository".format(name))
+
+        self[name] = ModuleDefinition(is_package, source)
+
+
+def build_inlined(files, packages):
+    # type: (List[str], List[str]) -> Dict[str, ModuleDefinition]
+
+    inlined = Repository()
 
     for f in files:
-        name = extract_module_name(f)
+        # Technically you can import a module named "__init__", but you probably didn't mean to.
+        inlined.insert_module(extract_module_name(f), get_file_source(f), False)
 
-        if name in inlined:
-            raise InlinerException("Module {!r} is already present in the inlining dictionary".format(name))
+    for p in packages:
+        _orig_p = p
+        if p.endswith("__init__.py"):
+            p = os.path.dirname(p)
 
-        inlined[name] = ModuleDefinition(False, get_file_source(f))
+        dirs = [(extract_package_name(p), p)]
+        while dirs:
+            pkg, d = dirs.pop(0)
+            if not os.path.exists(os.path.join(d, "__init__.py")):
+                if d == p:
+                    raise InlinerException(
+                        "Given package path {!r} does not correspond to a python package".format(_orig_p)
+                    )
+                continue
+
+            for f in os.listdir(d):
+                path = os.path.join(d, f)
+                if os.path.isdir(path):
+                    dirs.append((".".join([pkg, f]), path))
+                    continue
+
+                is_package = f == "__init__.py"
+                name = pkg
+                if not is_package:
+                    name = ".".join([name, extract_module_name(f)])
+
+                inlined.insert_module(name, get_file_source(path), is_package)
 
     return inlined
