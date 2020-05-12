@@ -1,6 +1,6 @@
-# InlineImporter
+# Inline-Importer
 
-InlineImporter is a library for python projects that uses the PEP 302 import protocol to inline libraries into a script.
+Inline-Importer is a library for python projects that uses the PEP 302 import protocol to inline libraries into a single-file script.
 
 ## Why?
 
@@ -20,7 +20,7 @@ The Loader is, as you've guessed it, responsible for loading modules into the en
 It does so by first creating a module object, which the python machinery places into the `sys.modules` dictionary, then executing the module code.
 An object that can both Find and Load is called an `Importer`.
 
-InlineImporter works by placing the source code of modules in a dictionary, keyed by module name.
+Inline-Importer works by placing the source code of modules in a dictionary, keyed by module name.
 The finder searche the dictionary for a key matching the given module name.
 If found, it returns a ModuleSpec with itself listed as the loader.
 The loader simply compiles the inlined source code to python bytecode, and executes it as the normal python loader does.
@@ -42,5 +42,6 @@ While the importer is built, the rest of the machinery isn't.
 * [x] Importer with PoC.
 * [x] Script to collect all the modules to be inlined and build the dictionary.
 * [x] Script that can combine the importer and the modules.
+* [ ] Support for compressing the inlined modules.
 * [ ] Support for inlining distributed python libraries.
 * [ ] Support for pre-compiled bytecode.
