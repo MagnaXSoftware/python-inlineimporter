@@ -34,7 +34,7 @@ setup(
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
@@ -46,6 +46,5 @@ setup(
     ],
     python_requires="~=3.4",
     packages=find_packages(exclude=()),
-    # py_modules=[splitext(basename(path))[0] for path in glob("src/*.py")],
     entry_points={"console_scripts": ["inline-python = inline_importer.__main__:main"]},
 )
