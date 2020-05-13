@@ -35,6 +35,7 @@ Advanced Information & Development
    advanced/how-it-works
    advanced/usage
    advanced/develop
+   advanced/api
 
 
 Indices and tables

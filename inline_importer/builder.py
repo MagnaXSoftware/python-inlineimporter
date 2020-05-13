@@ -14,6 +14,16 @@ def build_file(
     """Builds an single file script containing the importer module.
 
     This function returns the inlined script as a string.
+
+    Args:
+        inlined_modules (`~inline_importer.inliner.Repository` or dict(str, `~inline_importer.inliner.ModuleDefinition`)): Repository of modules
+        entrypoint (str): the source code of the entrypoint
+        importer_module (str, optional): the fully-qualified name of the importer module to inline with the script
+        shebang (bool, optional): whether to include a shebang at the top of the script
+        namespace_package (bool, optional): Whether to treat packages as **PEP 420** namespace packges.
+
+    Returns:
+        str: The source of the self-contained script.
     """
 
     importer_source = get_module_source(importer_module)
@@ -48,8 +58,13 @@ def write_file(file_or_filename, *args, **kwargs):
 
     Other than a filename, the rest of the arguments are passed verbatim to build_file.
 
-    :param file_or_filename: Either a file-like object with a `write` method or a str-like object representing a filename.
-    :return: integer, the numer of bytes written
+    Args:
+        file_or_filename (`file`-like object or `str`-like): Either a file-like object with a `write` method or a str-like object representing a filename.
+        *args: parameters from `build_file`
+        **kwargs: parameters from `build_file`
+    
+    Returns:
+        int: The number of bytes written to file_or_filename
     """
 
     if hasattr(file_or_filename, "write"):

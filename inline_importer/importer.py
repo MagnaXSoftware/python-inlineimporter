@@ -6,6 +6,7 @@ from importlib.machinery import ModuleSpec
 
 
 class InlineImporter(ExecutionLoader, MetaPathFinder):
+    """Implements at the class level both PEP 302's ``Finder`` and ``Loader`` protocols."""
 
     version = None
     inlined_modules = {}
@@ -32,11 +33,11 @@ class InlineImporter(ExecutionLoader, MetaPathFinder):
     @staticmethod
     def _call_with_frames_removed(f, *args, **kwds):
         """remove_importlib_frames in import.c will always remove sequences
-        of importlib frames that end with a call to this function
+        of frames that end with a call to this function.
 
         Use it instead of a normal call in places where including the importlib
         frames introduces unwanted noise into the traceback (e.g. when executing
-        module code)
+        module code).
         """
         return f(*args, **kwds)
 
@@ -47,7 +48,10 @@ class InlineImporter(ExecutionLoader, MetaPathFinder):
 
     @classmethod
     def exec_module(cls, module):
-        """Execute the module."""
+        """Method to execute the module.
+        
+        Raises ImportError if the module has no code object.
+        """
         code = cls.get_code(module.__name__)
         if code is None:
             raise ImportError("cannot load module {!r} when get_code() returns None".format(module.__name__))
@@ -56,7 +60,7 @@ class InlineImporter(ExecutionLoader, MetaPathFinder):
     @classmethod
     @_lru_cache(maxsize=None)
     def get_filename(cls, fullname):
-        """Returns the 
+        """Method to return the generated filename for fullname. 
 
         Raises ImportError if the module cannot be found.
         """
@@ -74,6 +78,10 @@ class InlineImporter(ExecutionLoader, MetaPathFinder):
     @classmethod
     @_lru_cache(maxsize=None)
     def is_package(cls, fullname):
+        """Method to return whether fullname is a package.
+
+        Raise ImportError if the module cannot be found.
+        """
         if fullname not in cls.inlined_modules:
             raise ImportError
 
@@ -81,6 +89,10 @@ class InlineImporter(ExecutionLoader, MetaPathFinder):
 
     @classmethod
     def get_source(cls, fullname):
+        """Method to return the source for fullname.
+
+        Raise ImportError if the module cannot be found.
+        """
         if fullname not in cls.inlined_modules:
             raise ImportError
 
