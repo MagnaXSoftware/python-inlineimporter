@@ -1,5 +1,7 @@
 # Inline-Importer
 
+[![Documentation Status](https://readthedocs.org/projects/inline-importer/badge/?version=latest)](https://inline-importer.readthedocs.io/en/latest/?badge=latest)
+
 Inline-Importer is a library for python projects that uses the PEP 302 import protocol to inline libraries into a single-file script.
 
 ## Why?
