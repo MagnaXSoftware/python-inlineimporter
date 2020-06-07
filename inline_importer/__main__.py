@@ -43,7 +43,8 @@ def parse_args(name):
     parser.add_argument(
         "-n",
         "--namespace-inlined-packages",
-        help="Whether inlined packages be marked as PEP 420 namespace packages. None uses the libary default, currently False",
+        help="Whether inlined packages be marked as PEP 420 namespace packages. None uses the libary default, "
+             "currently False",
         default=None,
         choices=(None, True, False),
         type=_ternary_type,
@@ -52,7 +53,8 @@ def parse_args(name):
     parser.add_argument(
         "-i",
         "--importer-module",
-        help="Fully qualified name of the importer module. Must contain a class named InlineImporter, matching the interface of inline_importer.importer:InlineImporter",
+        help="Fully qualified name of the importer module. Must contain a class named InlineImporter, matching the "
+             "interface of inline_importer.importer:InlineImporter",
         default="inline_importer.importer",
     )
 
@@ -68,7 +70,8 @@ def parse_args(name):
     inputs.add_argument(
         "-p",
         "--input-package",
-        help="Path to a package to inline. This should be either the path to the __init__.py file or the folder containing it. All submodules and subpackages will also be imported",
+        help="Path to a package to inline. This should be either the path to the __init__.py file or the folder "
+             "containing it. All submodules and subpackages will also be imported",
         dest="input_packages",
         default=[],
         nargs="*",
@@ -96,14 +99,14 @@ def main():
     args = parse_args(name)
 
     # Collect and inline the modules
-    # Because of the mutually exclusive group, we only have one type of entrypoint defined
+    # Because of the mutually exclusive group, we know we only have one type of entrypoint defined
     entrypoint = args.entrypoint_script
     if args.entrypoint_file:
         entrypoint = inliner.get_file_source(args.entrypoint_file)
     if args.entrypoint_module:
         entrypoint = inliner.get_module_source(args.entrypoint_module)
 
-    inlined = inliner.build_inlined(files=args.input_files, packages=args.input_packages)
+    inlined = inliner.build_inlined(modules=args.input_files, packages=args.input_packages)
 
     # Build the inlined script
     output = args.output_file
