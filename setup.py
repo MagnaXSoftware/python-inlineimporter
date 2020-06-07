@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import unittest
+
 from setuptools import setup, find_packages
 
 
@@ -15,6 +17,12 @@ def package_vars(version_file):
     with open(version_file) as f:
         exec(f.read(), pkg_vars)  # nosec
     return pkg_vars
+
+
+def test_suite():
+    loader = unittest.TestLoader()
+    suite = loader.discover('inline_importer/tests', pattern='test_*.py')
+    return suite
 
 
 setup(
@@ -46,5 +54,6 @@ setup(
     ],
     python_requires="~=3.4",
     packages=find_packages(exclude=()),
+    test_suite='setup.test_suite',
     entry_points={"console_scripts": ["inline-python = inline_importer.__main__:main"]},
 )

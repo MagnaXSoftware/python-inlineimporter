@@ -82,7 +82,8 @@ def extract_module_name(path):
         str: The name the module
 
     Raises:
-        `~inline_importer.InlinerException`: If unable to determine the name of the module (there is no ``.`` in the filename).
+        `~inline_importer.InlinerException`: If unable to determine the name of the module (there is no ``.`` in the
+        filename).
     """
     name = os.path.basename(path).rpartition(".")[0]
 
@@ -109,8 +110,12 @@ def extract_package_name(path):
 
     Returns:
         str: The name of the package for the given path.
+
+    Raises:
+        `~inline_importer.InlinerException`: If unable to determine the name of the package.
     """
 
+    _o_path = path
     if "." in os.path.basename(path):
         # Because python modules cannot contain dots, if there is a dot in the last component of a path, it's a module,
         # so we get the dirname instead.
@@ -119,7 +124,11 @@ def extract_package_name(path):
     if path[-1:] == "/":
         path = path[:-1]
 
-    return os.path.basename(path)
+    base = os.path.basename(path)
+    if not base:
+        raise InlinerException("Unable to determine the name of the package for {}".format(_o_path))
+
+    return base
 
 
 class Repository(dict):
@@ -175,7 +184,9 @@ def build_inlined(modules, packages):
             root_package_path = os.path.dirname(root_package_path)
 
         dirs = [(extract_package_name(root_package_path), root_package_path)]
-        # dirs is a list of tuples, where each tuple contains (0) the name of the package (unqualified), (1) the path of the package
+        # dirs is a list of tuples, where each tuple contains
+        #   (0) the name of the package (unqualified),
+        #   (1) the path of the package
         while dirs:
             package_name, package_path = dirs.pop(0)
             if not os.path.exists(os.path.join(package_path, "__init__.py")):
